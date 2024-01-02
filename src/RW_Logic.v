@@ -15,6 +15,45 @@ output reg [3:0] ICWFlags, // ICW flags to check if ICW1, ICW2, ICW3, ICW4 have 
 output shouldInitiateFlags // flag to indicate if ICWFlags should be reset
 );
 
+//------------------------------------------------------------------------------
+// Description:
+//   This Verilog module, named RWLogic, is designed to handle read and write
+//   operations for a set of registers based on control signals and a global bus.
+//   It supports Initialization Command Words (ICW) and Operational Command Words (OCW).
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Module Ports:
+//   Input Ports:
+//     - input [7:0] globalBus: 8-bit global bus for data communication.
+//     - input A0: Indicates the type of command word.
+//     - input CS: Chip select (active low) to enable the module.
+//     - input WR: Write signal (active low) for write operations.
+//     - input RD: Read signal (active low) for read operations.
+//   Output Ports:
+//     - output reg [7:0] ICW1: ICW1 register for initialization.
+//     - output reg [7:0] ICW2: ICW2 register for initialization.
+//     - output reg [7:0] ICW3: ICW3 register for initialization.
+//     - output reg [7:0] ICW4: ICW4 register for initialization.
+//     - output reg [7:0] OCW1: OCW1 register for operational commands.
+//     - output reg [7:0] OCW2: OCW2 register for operational commands.
+//     - output reg [7:0] OCW3: OCW3 register for operational commands.
+//     - output reg [3:0] ICWFlags: Flags to track the initialization state of ICW registers.
+//     - output shouldInitiateFlags: Flag to indicate if ICWFlags should be reset.
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Operation:
+//   The module processes read and write operations based on the control signals
+//   (A0, CS, WR, RD) and the global bus (globalBus). It supports the following
+//   functionality:
+//   - Initialization Command Words (ICW) handling for ICW1, ICW2, ICW3, ICW4.
+//   - Operational Command Words (OCW) handling for OCW1, OCW2, OCW3.
+//   - Flags (ICWFlags) to track the state of ICW processing.
+//   - Initialization of flags based on the rising edge of CS and RD signals.
+//   - Conditional updates of ICW and OCW registers based on control signals and flags.
+//------------------------------------------------------------------------------
+
 wire chipSelected = ~CS;
 wire writeSignal = ~RD;
 wire readSignal = ~WR;
