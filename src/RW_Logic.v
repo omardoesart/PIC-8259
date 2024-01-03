@@ -55,11 +55,11 @@ output shouldInitiateFlags // flag to indicate if ICWFlags should be reset
 //------------------------------------------------------------------------------
 
 wire chipSelected = ~CS;
-wire writeSignal = ~RD;
-wire readSignal = ~WR;
+wire writeSignal = ~WR;
+wire readSignal  =  ~RD;
 
 // initialize registers ICWFlags to 0
-assign shouldInitiateFlags = ~A0 && globalBus[4] && chipSelected && readSignal;
+assign shouldInitiateFlags = ~A0 && globalBus[4] && chipSelected && writeSignal;
 always @(A0) begin
     if (shouldInitiateFlags) begin
         ICWFlags <= 0;
@@ -82,16 +82,16 @@ always @(globalBus or A0) begin
         end
     end
 
-    if(chipSelected && readSignal && ~&ICWFlags) begin
-        if(A0 && ICWFlags[0] && ~ICWFlags[1]) begin
+    if( A0 && chipSelected && writeSignal && ICWFlags[0] == 1'b1 ) begin
+        if( ~ICWFlags[1]) begin
             ICW2 <= globalBus;
             ICWFlags[1] <= 1;
         end
-        if(A0 && ICWFlags[0] && ICWFlags[1] && ~ICWFlags[2]) begin
+        if( ICWFlags[1] && ~ICWFlags[2]) begin
             ICW3 <= globalBus;
             ICWFlags[2] <= 1;
         end
-        if(A0 && ICWFlags[0] && ICWFlags[1] && ICWFlags[2] && ~ICWFlags[3]) begin
+        if( ICWFlags[1] && ICWFlags[2] && ~ICWFlags[3]) begin
             ICW4 <= globalBus;
             ICWFlags[3] <= 1;
         end
@@ -100,14 +100,14 @@ end
 
 // assign values to OCW registers
 always @(globalBus or A0) begin
-    if(chipSelected && readSignal && &ICWFlags) begin
+    if(chipSelected && writeSignal && ICWFlags == 4'b1111 ) begin
         if(A0) begin
             OCW1 <= globalBus;
         end
-        if(~A0 && ~globalBus[3]) begin
+        if(~A0 && ~globalBus[4] && ~globalBus[3]) begin
             OCW2 <= globalBus;
         end
-        if(~A0 && globalBus[3]) begin
+        if(~A0 && ~globalBus[4] && globalBus[3]) begin
             OCW3 <= globalBus;
         end
     end
